@@ -1,23 +1,31 @@
 CC          = gcc
-CFLAGS      = -Wall -Wextra -Iinclude/
+CFLAGS      = -Wall -Wextra -march=native -O0 -Iinclude/
 LDFLAGS     = -lm
 
 OMP_CC      = gcc
-OMP_CFLAGS  = $(CFLAGS)
-OMP_LDFLAGS = $(LDFLAGS)
+OMP_CFLAGS  = -fopenmp $(CFLAGS)
+OMP_LDFLAGS = -fopenmp $(LDFLAGS)
 
 MPI_CC      = mpicc
 MPI_CFLAGS  = $(CFLAGS)
 MPI_LDFLAGS = $(LDFLAGS)
 
 
-all: bin/serial
+all: bin/serial bin/omp
 
-# Serial objs
+# Executables
 bin/serial: bin/obj/serial.o bin/obj/main.o bin/obj/math_funcs.o
 	$(CC) -o $@ $^ $(LDFLAGS)
+bin/omp: bin/obj/omp.o bin/obj/main.o bin/obj/math_funcs.o
+	$(OMP_CC) -o $@ $^ $(OMP_LDFLAGS)
+
+# Serial objs
 bin/obj/serial.o: src/impl/serial.c
 	$(CC) -o $@ -c $^ $(CFLAGS)
+
+# OpenMP objs
+bin/obj/omp.o: src/impl/omp.c
+	$(OMP_CC) -o $@ -c $^ $(OMP_CFLAGS)
 
 # General objs
 bin/obj/main.o: src/main.c

@@ -14,13 +14,13 @@ MPI_LDFLAGS =
 all: bin/serial bin/omp bin/mpi bin/mpi_omp
 
 # Executables
-bin/serial: bin/obj/serial.o bin/obj/main.o bin/obj/math_funcs.o
+bin/serial: bin/obj/serial.o bin/obj/main.o bin/obj/utils.o bin/obj/math_funcs.o
 	$(CC) -o $@ $^ $(LDFLAGS)
-bin/omp: bin/obj/omp.o bin/obj/main.o bin/obj/math_funcs.o
+bin/omp: bin/obj/omp.o bin/obj/main.o bin/obj/utils.o bin/obj/math_funcs.o
 	$(OMP_CC) -o $@ $^ $(LDFLAGS) $(OMP_LDFLAGS)
-bin/mpi: bin/obj/mpi.o bin/obj/main.o bin/obj/math_funcs.o
+bin/mpi: bin/obj/mpi.o bin/obj/main.o bin/obj/utils.o bin/obj/math_funcs.o
 	$(MPI_CC) -o $@ $^ $(LDFLAGS) $(MPI_LDFLAGS)
-bin/mpi_omp: bin/obj/mpi_omp.o bin/obj/main.o bin/obj/math_funcs.o
+bin/mpi_omp: bin/obj/mpi_omp.o bin/obj/main.o bin/obj/utils.o bin/obj/math_funcs.o
 	$(MPI_CC) -o $@ $^ $(LDFLAGS) $(MPI_LDFLAGS) $(OMP_LDFLAGS)
 
 # Serial objs
@@ -41,6 +41,8 @@ bin/obj/mpi_omp.o: src/impl/mpi_omp.c
 
 # General objs
 bin/obj/main.o: src/main.c
+	$(CC) -o $@ -c $^ $(CFLAGS)
+bin/obj/utils.o: src/utils.c
 	$(CC) -o $@ -c $^ $(CFLAGS)
 bin/obj/math_funcs.o: src/math_funcs.c
 	$(CC) -o $@ -c $^ $(CFLAGS)

@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "typeinfo": "c",
-        "numint.h": "c"
+        "numint.h": "c",
+        "random": "c"
     }
 }

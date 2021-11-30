@@ -1,27 +1,23 @@
 CC          = gcc
+MPI_CC      = mpicc
+
 CFLAGS      = -Wall -Wextra -march=native -O0 -Iinclude/
 LDFLAGS     = -lm
 
-OMP_CC      = gcc
-OMP_CFLAGS  = -fopenmp
-OMP_LDFLAGS = -fopenmp
 
-MPI_CC      = mpicc
-MPI_CFLAGS  =
-MPI_LDFLAGS =
-
-
-all: bin/serial bin/omp bin/mpi bin/mpi_omp
+all: bin/serial bin/omp bin/mpi bin/pthread bin/mpi_omp
 
 # Executables
 bin/serial: bin/obj/serial.o bin/obj/main.o bin/obj/utils.o bin/obj/math_funcs.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 bin/omp: bin/obj/omp.o bin/obj/main.o bin/obj/utils.o bin/obj/math_funcs.o
-	$(OMP_CC) -o $@ $^ $(LDFLAGS) $(OMP_LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS) -fopenmp
 bin/mpi: bin/obj/mpi.o bin/obj/main.o bin/obj/utils.o bin/obj/math_funcs.o
-	$(MPI_CC) -o $@ $^ $(LDFLAGS) $(MPI_LDFLAGS)
+	$(MPI_CC) -o $@ $^ $(LDFLAGS)
+bin/pthread: bin/obj/pthread.o bin/obj/main.o bin/obj/utils.o bin/obj/math_funcs.o
+	$(CC) -o $@ $^ $(LDFLAGS) -lpthread
 bin/mpi_omp: bin/obj/mpi_omp.o bin/obj/main.o bin/obj/utils.o bin/obj/math_funcs.o
-	$(MPI_CC) -o $@ $^ $(LDFLAGS) $(MPI_LDFLAGS) $(OMP_LDFLAGS)
+	$(MPI_CC) -o $@ $^ $(LDFLAGS) -fopenmp
 
 # Serial objs
 bin/obj/serial.o: src/impl/serial.c
@@ -29,15 +25,19 @@ bin/obj/serial.o: src/impl/serial.c
 
 # OpenMP objs
 bin/obj/omp.o: src/impl/omp.c
-	$(OMP_CC) -o $@ -c $^ $(CFLAGS) $(OMP_CFLAGS)
+	$(CC) -o $@ -c $^ $(CFLAGS) -fopenmp
 
 # MPI objs
 bin/obj/mpi.o: src/impl/mpi.c
-	$(MPI_CC) -o $@ -c $^ $(CFLAGS) $(MPI_CFLAGS)
+	$(MPI_CC) -o $@ -c $^ $(CFLAGS)
+
+# pthread objs
+bin/obj/pthread.o: src/impl/pthread.c
+	$(CC) -o $@ -c $^ $(CFLAGS)
 
 # MPI + OpenMP objs
 bin/obj/mpi_omp.o: src/impl/mpi_omp.c
-	$(MPI_CC) -o $@ -c $^ $(CFLAGS) $(MPI_CFLAGS) $(OMP_CFLAGS)
+	$(MPI_CC) -o $@ -c $^ $(CFLAGS) -fopenmp
 
 # General objs
 bin/obj/main.o: src/main.c
@@ -48,4 +48,4 @@ bin/obj/math_funcs.o: src/math_funcs.c
 	$(CC) -o $@ -c $^ $(CFLAGS)
 
 clean:
-	rm -f bin/serial bin/omp bin/mpi bin/mpi_omp bin/obj/*.o
+	rm -f bin/serial bin/omp bin/mpi bin/pthread bin/mpi_omp bin/obj/*.o

@@ -4,37 +4,37 @@
 #include "numint.h"
 
 
-double mf_unit(__attribute__((__unused__)) double x)
+static double mf_unit(__attribute__((__unused__)) double x)
 {
     return 1.0;
 }
 
-double mf_identity(double x)
+static double mf_identity(double x)
 {
     return x;
 }
 
-double mf_square(double x)
+static double mf_square(double x)
 {
     return x*x;
 }
 
-double mf_cube(double x)
+static double mf_cube(double x)
 {
     return x*x*x;
 }
 
-double mf_inverse(double x)
+static double mf_inverse(double x)
 {
     return 1/x;
 }
 
-double mf_loge(double x)
+static double mf_loge(double x)
 {
     return log(x);
 }
 
-double mf_misc_0(double x)
+static double mf_misc_0(double x)
 {
     return 2 * pow(x, 1./3) - 1./(3*x) + sin(x)/2;
 }

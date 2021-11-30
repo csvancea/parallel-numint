@@ -14,4 +14,25 @@ typedef double (*onedim_func_t)(double x);
  */
 double numint(onedim_func_t f, double a, double b, unsigned n);
 
+/**
+ * @brief Initialize numint library.
+ * 
+ * Needed by implementations with special startup/finalize requirements (eg: MPI)
+ */
+void numint_init();
+
+/**
+ * @brief Finalize numint library.
+ * 
+ * Needed by implementations with special startup/finalize requirements (eg: MPI)
+ */
+void numint_end();
+
+/**
+ * @brief Process type.
+ * 
+ * @returns true if the caller is the master process, otherwise false
+ */
+int  numint_is_master();
+
 #endif // NUMINT_H

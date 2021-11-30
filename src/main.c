@@ -1,15 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #include "numint.h"
 #include "math_funcs.h"
 
 
+void master_printf(const char *fmt, ...)
+{
+    va_list arglist;
+
+    if (numint_is_master()) {
+        va_start(arglist, fmt);
+        vprintf(fmt, arglist);
+        va_end(arglist);
+    }
+}
+
 int main(int argc, char **argv)
 {
+    numint_init();
+
     if (argc < 5) {
-        printf("Usage: %s [math-func-name] [a] [b] [n]\n", argv[0]);
-        return 0;
+        master_printf("Usage: %s [math-func-name] [a] [b] [n]\n", argv[0]);
+        goto cleanup;
     }
 
     char *func_name = argv[1];
@@ -19,16 +33,20 @@ int main(int argc, char **argv)
     onedim_func_t f = get_test_func(func_name);
 
     if (f == NULL) {
-        printf("Invalid func name provided.\n");
+        master_printf("Invalid func name provided.\n");
+        goto cleanup;
     }
 
     if (n == 0) {
-        printf("n must be non-zero.\n");
-        return 0;
+        master_printf("n must be non-zero.\n");
+        goto cleanup;
     }
 
-    printf("Integrating f=%s over [%f, %f] in %d steps.\n", func_name, a, b, n);
+    master_printf("Integrating f=%s over [%f, %f] in %d steps.\n", func_name, a, b, n);
     double result = numint(f, a, b, n);
-    printf("Result = %f\n", result);
+    master_printf("Result = %f\n", result);
+
+cleanup:
+    numint_end();
     return 0;
 }

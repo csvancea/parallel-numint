@@ -26,3 +26,16 @@ double numint(onedim_func_t f, double a, double b, unsigned n)
 
     return h / 3 * (fma(2, sum_evens, f(a)) + fma(4, sum_odds, f(b)));
 }
+
+void numint_init()
+{
+}
+
+void numint_end()
+{
+}
+
+int numint_is_master()
+{
+    return 1;
+}

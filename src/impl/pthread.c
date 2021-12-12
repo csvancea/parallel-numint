@@ -9,14 +9,14 @@ typedef struct _numint_global_params {
     double a;
     double h;
     unsigned n;
-    unsigned nproc;
+    unsigned nthreads;
 } numint_global_params;
 
 typedef struct _numint_specific_params
 {
     const numint_global_params *global;
     pthread_t handle;
-    unsigned rank;
+    unsigned tid;
     double sum_odds;
     double sum_evens;
 } numint_specific_params;
@@ -25,19 +25,19 @@ typedef struct _numint_specific_params
 static void *numint_impl(void *arg)
 {
     numint_specific_params *params = arg;
-    onedim_func_t f  = params->global->f;
-    double   a       = params->global->a;
-    double   h       = params->global->h;
-    unsigned n       = params->global->n;
-    unsigned nproc   = params->global->nproc;
-    unsigned rank    = params->rank;
+    onedim_func_t f   = params->global->f;
+    double   a        = params->global->a;
+    double   h        = params->global->h;
+    unsigned n        = params->global->n;
+    unsigned nthreads = params->global->nthreads;
+    unsigned tid      = params->tid;
 
     /* there are (n - 1) inner points which will be equally spread among the threads. */
-    unsigned start   =     ((rank + 0) * (n - 1) / nproc + 1   );
-    unsigned end     = _MIN((rank + 1) * (n - 1) / nproc + 1, n);
-    
-    double sum_odds  = 0.0;
-    double sum_evens = 0.0;
+    unsigned start    =     ((tid + 0) * (n - 1) / nthreads + 1   );
+    unsigned end      = _MIN((tid + 1) * (n - 1) / nthreads + 1, n);
+
+    double sum_odds   = 0.0;
+    double sum_evens  = 0.0;
 
     /*
      * i must be an odd integer here.
@@ -47,7 +47,7 @@ static void *numint_impl(void *arg)
     {
         sum_odds += f(fma(i, h, a));
     }
-    
+
     /*
      * i must be an even integer here.
      * This bit trickery sets i to the first even integer greater or equal to start.
@@ -68,23 +68,23 @@ double numint(onedim_func_t f, double a, double b, unsigned n)
     double sum_odds = 0.0;
     double sum_evens = 0.0;
 
-    unsigned nproc = get_num_of_procs();
-    numint_specific_params *params = malloc(nproc * sizeof(numint_specific_params));
+    unsigned nthreads = get_num_of_procs();
+    numint_specific_params *params = malloc(nthreads * sizeof(numint_specific_params));
     numint_global_params global = {
         .a = a,
         .f = f,
         .h = h,
         .n = n,
-        .nproc = nproc
+        .nthreads = nthreads
     };
 
-    for (unsigned i = 0; i < nproc; ++i) {
+    for (unsigned i = 0; i < nthreads; ++i) {
         params[i].global = &global;
-        params[i].rank = i;
+        params[i].tid = i;
         pthread_create(&params[i].handle, NULL, numint_impl, &params[i]);
     }
 
-    for (unsigned i = 0; i < nproc; ++i) {
+    for (unsigned i = 0; i < nthreads; ++i) {
         pthread_join(params[i].handle, NULL);
         sum_odds  += params[i].sum_odds;
         sum_evens += params[i].sum_evens;

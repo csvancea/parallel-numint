@@ -1,7 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#define _MIN(a, b) (a) < (b) ? (a) : (b)
+#define _MIN(a, b) ((a) < (b) ? (a) : (b))
 
 /**
  * @brief Number of available processors.

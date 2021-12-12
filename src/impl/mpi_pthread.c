@@ -118,7 +118,6 @@ static void numint_mpi_worker(int rank, int nproc, onedim_func_t f, double a, do
         sum_odds  += params[i].sum_odds;
         sum_evens += params[i].sum_evens;
     }
-
     free(params);
 
     /* local_sums vector is received by the MASTER node when MPI_Reduce is called */

@@ -4,6 +4,7 @@
 #include "numint.h"
 #include "utils.h"
 
+/* these structs are used to pass data/context to threads */
 typedef struct _numint_global_params {
     onedim_func_t f;
     double a;
@@ -68,6 +69,7 @@ double numint(onedim_func_t f, double a, double b, unsigned n)
     double sum_odds = 0.0;
     double sum_evens = 0.0;
 
+    /* initialize global context for threads */
     unsigned nthreads = get_num_of_procs();
     numint_specific_params *params = malloc(nthreads * sizeof(numint_specific_params));
     numint_global_params global = {
@@ -78,19 +80,22 @@ double numint(onedim_func_t f, double a, double b, unsigned n)
         .nthreads = nthreads
     };
 
+    /* initialize specific context for each thread and create the threads */
     for (unsigned i = 0; i < nthreads; ++i) {
         params[i].global = &global;
         params[i].tid = i;
         pthread_create(&params[i].handle, NULL, numint_impl, &params[i]);
     }
 
+    /* join the threads and sum the partial sums */
     for (unsigned i = 0; i < nthreads; ++i) {
         pthread_join(params[i].handle, NULL);
         sum_odds  += params[i].sum_odds;
         sum_evens += params[i].sum_evens;
     }
-
     free(params);
+
+    /* compute f(a), f(b) and the overall sum/result */
     return h / 3 * (fma(2, sum_evens, f(a)) + fma(4, sum_odds, f(b)));
 }
 

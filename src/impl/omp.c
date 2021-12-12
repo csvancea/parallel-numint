@@ -9,8 +9,17 @@ double numint(onedim_func_t f, double a, double b, unsigned n)
     double sum_odds = 0.0;
     double sum_evens = 0.0;
 
+    /* create a parallel scope */
     #pragma omp parallel shared(a, h, n)
     {
+        /*
+         * the first for computes the sum for odd numbers, and the second does it for even numbers
+         *
+         * reduction is used to sum up the results
+         *
+         * nowait is used so threads won't have to wait until all the other threads
+         * finish computing their odd numbers sum
+         */
         #pragma omp for reduction(+:sum_odds) nowait
         for (unsigned i = 1; i < n; i += 2)
         {

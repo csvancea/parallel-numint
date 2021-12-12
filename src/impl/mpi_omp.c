@@ -6,6 +6,7 @@
 
 #define MASTER 0
 
+/* this enum is used for interprocess MPI comms only */
 enum {
     SUM_ODDS = 0,
     SUM_EVENS,
@@ -18,13 +19,22 @@ static void numint_impl(int rank, int nproc, onedim_func_t f, double a, double h
     /* there are (n - 1) inner points which will be equally spread among the processes. */
     unsigned start =     ((rank + 0) * (n - 1) / nproc + 1   );
     unsigned end   = _MIN((rank + 1) * (n - 1) / nproc + 1, n);
-    
+
     double sum_odds  = 0.0;
     double sum_evens = 0.0;
 
+    /* create a parallel scope */
     #pragma omp parallel shared(a, h, n)
     {
         /*
+         * the first for computes the sum for odd numbers, and the second does it for even numbers
+         *
+         * reduction is used to sum up the results
+         *
+         * nowait is used so threads won't have to wait until all the other threads
+         * finish computing their odd numbers sum
+         *
+         *
          * i must be an odd integer here.
          * This bit trickery sets i to the first odd integer greater or equal to start.
          */
@@ -34,7 +44,7 @@ static void numint_impl(int rank, int nproc, onedim_func_t f, double a, double h
         {
             sum_odds += f(fma(i, h, a));
         }
-        
+
         /*
          * i must be an even integer here.
          * This bit trickery sets i to the first even integer greater or equal to start.
@@ -47,6 +57,7 @@ static void numint_impl(int rank, int nproc, onedim_func_t f, double a, double h
         }
     }
 
+    /* local_sums vector is received by the MASTER node when MPI_Reduce is called */
     local_sums[SUM_ODDS ] = sum_odds;
     local_sums[SUM_EVENS] = sum_evens;
 }

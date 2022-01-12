@@ -55,8 +55,8 @@ static void *numint_thread_worker(void *arg)
     unsigned n         = mpi_end - mpi_start;
 
     /* there are n = (mpi_end - mpi_start) inner points which will be equally spread among the threads. */
-    unsigned start     = mpi_start +     ((tid + 0) * n / nthreads   );
-    unsigned end       = mpi_start + _MIN((tid + 1) * n / nthreads, n);
+    unsigned start     = mpi_start +     ((tid + 0ULL) * n / nthreads   );
+    unsigned end       = mpi_start + _MIN((tid + 1ULL) * n / nthreads, n);
 
     double sum_odds    = 0.0;
     double sum_evens   = 0.0;
@@ -87,8 +87,8 @@ static void *numint_thread_worker(void *arg)
 static void numint_mpi_worker(int rank, int nproc, onedim_func_t f, double a, double h, unsigned n, double *local_sums)
 {
     /* there are (n - 1) inner points which will be equally spread among the processes. */
-    unsigned start =     ((rank + 0) * (n - 1) / nproc + 1   );
-    unsigned end   = _MIN((rank + 1) * (n - 1) / nproc + 1, n);
+    unsigned start =     ((rank + 0ULL) * (n - 1) / nproc + 1   );
+    unsigned end   = _MIN((rank + 1ULL) * (n - 1) / nproc + 1, n);
 
     double sum_odds  = 0.0;
     double sum_evens = 0.0;

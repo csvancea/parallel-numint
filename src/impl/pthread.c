@@ -34,8 +34,8 @@ static void *numint_impl(void *arg)
     unsigned tid      = params->tid;
 
     /* there are (n - 1) inner points which will be equally spread among the threads. */
-    unsigned start    =     ((tid + 0) * (n - 1) / nthreads + 1   );
-    unsigned end      = _MIN((tid + 1) * (n - 1) / nthreads + 1, n);
+    unsigned start    =     ((tid + 0ULL) * (n - 1) / nthreads + 1   );
+    unsigned end      = _MIN((tid + 1ULL) * (n - 1) / nthreads + 1, n);
 
     double sum_odds   = 0.0;
     double sum_evens  = 0.0;

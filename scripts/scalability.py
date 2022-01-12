@@ -18,7 +18,7 @@ TESTS = {
     "omp": {
         "invoke": "{EXEFILE} {ARGS}",
         "num_processes": [1],
-        "num_threads": [1, 2, 4, 8, 16, 32],
+        "num_threads": [1, 2, 4, 8, 12],
         "env": {
             "OMP_NUM_THREADS": "{NTHREADS}"
         }
@@ -26,28 +26,28 @@ TESTS = {
     "pthread": {
         "invoke": "{EXEFILE} {ARGS}",
         "num_processes": [1],
-        "num_threads": [1, 2, 4, 8, 16, 32],
+        "num_threads": [1, 2, 4, 8, 12],
         "env": {
             "NUMINT_NUM_PROCS": "{NTHREADS}"
         }
     },
     "mpi": {
         "invoke": "mpirun --oversubscribe -np {NPROCS} {EXEFILE} {ARGS}",
-        "num_processes": [1, 2, 4, 8, 16, 32],
+        "num_processes": [1, 2, 4, 8, 12],
         "num_threads": [1]
     },
     "mpi_omp": {
         "invoke": "mpirun --oversubscribe -np {NPROCS} {EXEFILE} {ARGS}",
-        "num_processes": [1, 2, 4, 8, 16, 32],
-        "num_threads": [1, 2, 4, 8, 16, 32],
+        "num_processes": [1, 2, 4],
+        "num_threads": [1, 2, 4],
         "env": {
             "OMP_NUM_THREADS": "{NTHREADS}"
         }
     },
     "mpi_pthread": {
         "invoke": "mpirun --oversubscribe -np {NPROCS} {EXEFILE} {ARGS}",
-        "num_processes": [1, 2, 4, 8, 16, 32],
-        "num_threads": [1, 2, 4, 8, 16, 32],
+        "num_processes": [1, 2, 4],
+        "num_threads": [1, 2, 4],
         "env": {
             "NUMINT_NUM_PROCS": "{NTHREADS}"
         }
@@ -58,7 +58,7 @@ ARGS = {
     "func": "misc_0",
     "a": 1,
     "b": 10,
-    "n": 10**9
+    "n": 2 * 10**8
 }
 
 

@@ -1,7 +1,7 @@
 CC          = gcc
 MPI_CC      = mpicc
 
-CFLAGS      = -Wall -Wextra -march=native -O0 -Iinclude/
+CFLAGS      = -Wall -Wextra -std=gnu99 -march=native -O0 -Iinclude/
 LDFLAGS     = -lm
 
 
